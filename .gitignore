@@ -1,5 +1,9 @@
 *.py[cod]
 
+# PyCharm
+.idea/*
+.idea/libraries/sass_stdlib.xml
+
 # C extensions
 *.so
 
