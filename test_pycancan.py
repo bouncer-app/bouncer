@@ -25,15 +25,21 @@ def test_ability():
             abilities.append(READ, ALL)
 
             def if_author(article):
-                return article.author == user
+                return article.author_id == user.id
 
             abilities.append(EDIT, Article, if_author)
+
+            # Alternatively
+
+            abilities.append(EDIT, BlogPost, author_id=user.id)
+            abilities.append(READ, BlogPost, visible=True, active=True)
 
 
     @authorization_target
     class User(object):
 
         def __init__(self, **kwargs):
+            self.id = kwargs.get('id', 1)
             self.name = kwargs['name']
             self.admin = kwargs['admin']
             pass
@@ -42,11 +48,18 @@ def test_ability():
         def is_admin(self):
             return self.admin
 
-
     class Article(object):
 
         def __init__(self, **kwargs):
             self.author = kwargs['author']
+
+    class BlogPost(object):
+
+        def __init__(self, **kwargs):
+            self.author_id = kwargs['author_id']
+            self.visible = kwargs.get('visible', True)
+            self.active = kwargs.get('active', True)
+
 
 
     # Test relevant_rules
@@ -75,6 +88,9 @@ def test_ability():
     assert relevant_rules[0].subjects == [Article]
 
     # check abilities
+
+    assert sally.can(EDIT, article)
+
 
     # sally = User(name='sally', admin=False)
 

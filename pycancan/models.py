@@ -10,11 +10,17 @@ def listify(list_or_single):
 
 
 class Rule(object):
-    def __init__(self, base_behavior, action, subject, conditions=None):
+    def __init__(self, base_behavior, action, subject, conditions=None, **conditions_hash):
         self.base_behavior = base_behavior
         self.actions = listify(action)
         self.subjects = listify(subject)
-        self.conditions = conditions
+
+        if conditions is not None and len(conditions_hash) > 0:
+            raise TypeError('cannot provide both a condition method and hash -- pick one')
+        elif conditions is not None:
+            self.conditions = conditions
+        elif len(conditions_hash) > 0:
+            self.conditions = conditions_hash
 
     # Matches both the subject and action, not necessarily the conditions
     def is_relavant(self, action, subject):
@@ -38,20 +44,34 @@ class Rule(object):
 
     # Matches the conditions
     def matches_conditions(self, action, subject):
-        pass
+        print "Matching Conditions on {} for {}".format(action,subject)
+        if self.conditions is None:
+            return True
+        elif isinstance(self.conditions, dict):
+            return self.matches_dict_conditions(action,subject)
+        else:
+            return self.matches_function_conditions(action,subject)
+
+    def matches_dict_conditions(self, action, subject):
+        return True
+
+    def matches_function_conditions(self, action, subject):
+        return self.conditions(subject)
+
+
 
     def matches_subject_class(self, subject):
         for sub in self.subjects:
             if inspect.isclass(sub):
                 if isinstance(subject, sub) or \
-                                subject.__class__.name == str(sub) or \
+                                subject.__class__.__name__ == str(sub) or \
                                 inspect.isclass(subject) and issubclass(subject, sub):
                     return True
         return False
 
 
 class RuleList(list):
-    def append(self, *item_description_or_rule):
+    def append(self, *item_description_or_rule, **kwargs):
         # Will check it a Rule or a description of a rule
         # construct a rule if necessary then append
         if len(item_description_or_rule) == 1 and isinstance(item_description_or_rule[0], Rule):
@@ -59,7 +79,7 @@ class RuleList(list):
             super(RuleList, self).append(item)
         else:
             # try to construct a rule
-            item = Rule(True, *item_description_or_rule)
+            item = Rule(True, *item_description_or_rule, **kwargs)
             super(RuleList, self).append(item)
 
 
@@ -72,14 +92,15 @@ class Ability(object):
 
     def __init__(self, user):
         self.rules = RuleList()
+        self.user = user
         Ability.authorize(user, self.rules)
 
 
     def can(self, action, subject):
-        self.rules.append(Rule(True, action, subject))
+        return any(rule.matches_conditions(action, subject) for rule in self.relevant_rules_for_match(action, subject))
 
     def cannot(self, action, subject):
-        self.rules.append(Rule(False, action, subject))
+        return not self.can(action, subject)
 
     def relevant_rules_for_match(self, action, subject):
         matching_rules = []

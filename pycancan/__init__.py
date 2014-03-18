@@ -22,6 +22,7 @@ def authorization_target(original_class):
 
     def can(self, action, subject):
         ability = Ability(self)
+        return ability.can(action, subject)
 
     setattr(original_class, 'can', can)
 
