@@ -14,6 +14,7 @@ class Rule(object):
         self.base_behavior = base_behavior
         self.actions = listify(action)
         self.subjects = listify(subject)
+        self.conditions = None
 
         if conditions is not None and len(conditions_hash) > 0:
             raise TypeError('cannot provide both a condition method and hash -- pick one')
@@ -58,11 +59,8 @@ class Rule(object):
     def matches_hash_condition(self, subject, key, value):
         return getattr(subject, key) == value
 
-
     def matches_function_conditions(self, action, subject):
         return self.conditions(subject)
-
-
 
     def matches_subject_class(self, subject):
         for sub in self.subjects:
