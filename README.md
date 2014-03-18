@@ -1,4 +1,4 @@
-pycancan
+pycancan (need better name)
 ========
 
 Simple Declarative Authentication based on Ryan Bates excellent cancan library
@@ -10,7 +10,7 @@ Simple Declarative Authentication based on Ryan Bates excellent cancan library
 
 # Getting Started
 
-1. Defining Abilities
+## 1. Defining Abilities
 
 User permissions are defined in an `method` decorated with `@authorize_method`
 
@@ -38,7 +38,7 @@ def authorize(user, abilities):
 
 See [Defining Abilities](#) for details
 
-2 Check Abilities & Authorization
+## 2. Check Abilities & Authorization
 
 Helper methods are mixed into your User model (once it is decorated with the `@authorization_target`)
 
