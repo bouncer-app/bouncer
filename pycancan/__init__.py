@@ -1,21 +1,42 @@
 __author__ = 'jtushman'
 
-def can(user,action,target):
-    # need to make sure that the Ability class has been loaded -- expect it in a certain path??
-    return _ability_class.authorize(user,action,target)
+from pycancan.models import Rule, Ability
 
 
-def is_authorized_to(action,item,condition=None):
-    pass
-
-_ability_class = None
-
-def acts_as_ability(original_class):
-
-    assert hasattr(original_class,'authorize'), 'Your Ability Class should implement authorize'
-    # check that authorize has the right signiture
+def authorization_method(original_method):
+    """The method that will be injected into the authorization target to perform authorization"""
+    Ability.set_authorization_method(original_method)
+    return original_method
 
 
-    global _ability_class
-    _ability_class = original_class
+_authorization_target = None
+
+
+def authorization_target(original_class):
+    """Add pycancan goodness to the model"""
+
+    def is_authotized_to(self, action, subject, conditions=None):
+        return True
+
+    setattr(original_class, 'is_authotized_to', is_authotized_to)
+
+    def can(self, action, subject):
+        ability = Ability(self)
+
+    setattr(original_class, 'can', can)
+
+    def cannot(self, action, subject):
+        self.runs.append(Rule(False, action, subject))
+
+    setattr(original_class, 'cannot', cannot)
+
+    def relevant_rules_for_match(self, action, subject):
+        return [rule for rule in self.rules if rule.is_relavant(action, subject)]
+
+    setattr(original_class, 'relevant_rules_for_match', relevant_rules_for_match)
+
     return original_class
+
+
+def authorize():
+    pass

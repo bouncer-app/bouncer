@@ -1,34 +1,36 @@
 import nose
+import inspect
 from nose.plugins.skip import SkipTest
 from nose.tools import *
 from nose.tools import assert_raises
 
-from pycancan import acts_as_ability, can, is_authorized_to
+from pycancan import authorization_target, authorization_method, Ability
 from pycancan.constants import *
+
+# try:
+#     from flask import Flask
+# except:
+#     flask = None
 
 
 def test_ability():
-    @acts_as_ability
-    class Ability(object):
 
-        def authorize(self, current_user):
+    @authorization_method
+    def authorize(user, abilities):
 
-            if current_user.is_admin:
-                is_authorized_to(MANAGE, ALL)
-            else:
-                is_authorized_to(READ, ALL)
+        if user.is_admin:
+            # self.can_manage(ALL)
+            abilities.append(MANAGE, ALL)
+        else:
+            abilities.append(READ, ALL)
 
-                def if_author(article):
-                    return article.author == current_user
+            def if_author(article):
+                return article.author == user
 
-                is_authorized_to(EDIT, Article, if_author)
+            abilities.append(EDIT, Article, if_author)
 
 
-    class Article(object):
-
-        def __init__(self, **kwargs):
-            self.author = kwargs['author']
-
+    @authorization_target
     class User(object):
 
         def __init__(self, **kwargs):
@@ -41,16 +43,96 @@ def test_ability():
             return self.admin
 
 
-    # check abilities
-    billy = User(name='billy', admin=True)
-    sally = User(name='sally', admin=False)
+    class Article(object):
 
-    assert can(billy, MANAGE, Article)
-    assert not can(sally, MANAGE, Article)
+        def __init__(self, **kwargs):
+            self.author = kwargs['author']
+
+
+    # Test relevant_rules
+    print "Testing Billy"
+    billy = User(name='billy', admin=True)
+    ability = Ability(billy)
+    relevant_rules = ability.relevant_rules_for_match(MANAGE, Article)
+    assert len(relevant_rules) == 1
+    assert relevant_rules[0].actions == [MANAGE]
+    assert relevant_rules[0].subjects == [ALL]
+
+    print "Testing Sally"
+    sally = User(name='sally', admin=False)
+    ability = Ability(sally)
+    relevant_rules = ability.relevant_rules_for_match(MANAGE, Article)
+    assert len(relevant_rules) == 0
+
+    relevant_rules = ability.relevant_rules_for_match(READ, Article)
+    assert len(relevant_rules) == 1
+    assert relevant_rules[0].actions == [READ]
+    assert relevant_rules[0].subjects == [ALL]
 
     article = Article(author=sally)
+    relevant_rules = ability.relevant_rules_for_match(EDIT, article)
+    assert relevant_rules[0].actions == [EDIT]
+    assert relevant_rules[0].subjects == [Article]
 
-    assert can(sally, EDIT, article)
+    # check abilities
 
+    # sally = User(name='sally', admin=False)
+
+
+    # assert billy.can(MANAGE, Article)
+    # assert not sally.can(MANAGE, Article)
+    # or
+    # assert sally.cannot(MANAGE, Article)
+
+    # article = Article(author=sally)
+
+    # assert sally.can(EDIT, article)
 
     # autorize
+
+# def requires_flask():
+#     return True
+#
+# @requires_flask
+# def test_flask():
+#
+#     @authorize_user
+#     def current_user():
+#         return 'current_user'
+#
+#     # Approach 1
+#     app = Flask()
+#     @app.route('/articles')
+#     @requires_ability(Article, READ)
+#     def articles():
+#         return "Hello"
+#
+#
+#     # Approach 2
+#     @app.route('/article/<id>', method=['post'])
+#     def articles(id):
+#         article = Article.find(id=id)
+#         authorize(EDIT,article) #raise 400 if not authorized
+#         return "Hello"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
