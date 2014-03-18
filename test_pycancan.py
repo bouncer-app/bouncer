@@ -25,7 +25,7 @@ def test_ability():
             abilities.append(READ, ALL)
 
             def if_author(article):
-                return article.author_id == user.id
+                return article.author == user
 
             abilities.append(EDIT, Article, if_author)
 
@@ -88,8 +88,14 @@ def test_ability():
     assert relevant_rules[0].subjects == [Article]
 
     # check abilities
-
+    print
+    print "Test Checking Abilities"
+    print
     assert sally.can(EDIT, article)
+
+    billys_article = Article(author=billy)
+
+    assert sally.cannot(EDIT, billys_article)
 
 
     # sally = User(name='sally', admin=False)

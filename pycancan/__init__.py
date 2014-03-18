@@ -27,7 +27,7 @@ def authorization_target(original_class):
     setattr(original_class, 'can', can)
 
     def cannot(self, action, subject):
-        self.runs.append(Rule(False, action, subject))
+        return not can(self, action, subject)
 
     setattr(original_class, 'cannot', cannot)
 

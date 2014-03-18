@@ -44,16 +44,16 @@ class Rule(object):
 
     # Matches the conditions
     def matches_conditions(self, action, subject):
-        print "Matching Conditions on {} for {}".format(action,subject)
+        # print "Matching Conditions on {} for {}".format(action, subject)
         if self.conditions is None:
             return True
         elif isinstance(self.conditions, dict):
-            return self.matches_dict_conditions(action,subject)
+            return self.matches_dict_conditions(action, subject)
         else:
-            return self.matches_function_conditions(action,subject)
+            return self.matches_function_conditions(action, subject)
 
     def matches_dict_conditions(self, action, subject):
-        return True
+        raise NotImplementedError('Working on it!')
 
     def matches_function_conditions(self, action, subject):
         return self.conditions(subject)
@@ -97,6 +97,7 @@ class Ability(object):
 
 
     def can(self, action, subject):
+        # print "Can {} {} on {}".format(self.user, action, subject)
         return any(rule.matches_conditions(action, subject) for rule in self.relevant_rules_for_match(action, subject))
 
     def cannot(self, action, subject):
@@ -106,8 +107,8 @@ class Ability(object):
         matching_rules = []
         for rule in self.rules:
             rule.expanded_actions = self.expand_actions(rule.actions)
-            print "Expanded Actions for {} is {}".format(rule.actions,rule.expanded_actions)
-            print "Testing relavancy: {} {}".format(action, subject)
+            # print "Expanded Actions for {} is {}".format(rule.actions,rule.expanded_actions)
+            # print "Testing relavancy: {} {}".format(action, subject)
             if rule.is_relavant(action, subject):
                 matching_rules.append(rule)
         return matching_rules
