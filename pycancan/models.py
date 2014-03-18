@@ -53,7 +53,11 @@ class Rule(object):
             return self.matches_function_conditions(action, subject)
 
     def matches_dict_conditions(self, action, subject):
-        raise NotImplementedError('Working on it!')
+        return all(self.matches_hash_condition(subject, key, value) for key, value in self.conditions.iteritems())
+
+    def matches_hash_condition(self, subject, key, value):
+        return getattr(subject, key) == value
+
 
     def matches_function_conditions(self, action, subject):
         return self.conditions(subject)

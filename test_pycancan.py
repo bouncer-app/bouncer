@@ -97,6 +97,10 @@ def test_ability():
 
     assert sally.cannot(EDIT, billys_article)
 
+    blog_post = BlogPost(author_id=sally.id)
+
+    assert sally.can(EDIT, blog_post)
+
 
     # sally = User(name='sally', admin=False)
 
