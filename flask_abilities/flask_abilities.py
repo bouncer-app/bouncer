@@ -51,7 +51,7 @@ class AbilityManager(object):
 
         return decorator
 
-    def init_app(self,app):
+    def init_app(self, app):
         # I am sure that we will need to put something in here soon
         app.before_request(self.check_abilities)
 
