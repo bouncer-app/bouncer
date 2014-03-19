@@ -1,5 +1,5 @@
 from flask import Flask, g
-from flask_abilities import AbilityManager, AuthorizationException, check_authorization
+from flask_abilities import AbilityManager, AuthorizationException, authorize
 from abilities.constants import *
 from nose.tools import *
 from .models import Article, TopSecretFile, User
@@ -11,7 +11,7 @@ ability = AbilityManager(app)
 
 
 @ability.authorization_method
-def authorize(user, abilities):
+def define_authorization(user, abilities):
 
     if user.is_admin:
         # self.can_manage(ALL)
@@ -42,7 +42,7 @@ def edit_post(post_id):
     # Find an article form a db -- faking for testing
     mary = User(name='mary', admin=False)
     article = Article(author_id=mary.id)
-    check_authorization(EDIT, article)
+    authorize(EDIT, article)
     # edit the post
     return "successfully edited post"
 

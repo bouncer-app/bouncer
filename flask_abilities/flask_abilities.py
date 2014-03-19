@@ -5,7 +5,7 @@ class AuthorizationException(Exception):
     pass
 
 
-def check_authorization(action, subject):
+def authorize(action, subject):
     ability = Ability(get_current_user())
     if ability.cannot(action, subject):
         raise AuthorizationException("User does not have access to resource")
@@ -48,8 +48,8 @@ class AbilityManager(object):
     def requires(self, *args):
 
         def decorator(f):
-            print "args: ", args
-            print "is this the endpoint: {}".format(f.__name__)
+            # print "args: ", args
+            # print "is this the endpoint: {}".format(f.__name__)
 
             self.endpoint_dict.setdefault(f.__name__, list())
             self.endpoint_dict[f.__name__].append(Condition(*args))
