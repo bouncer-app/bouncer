@@ -7,11 +7,6 @@ from nose.tools import assert_raises
 from abilities import authorization_target, authorization_method, Ability
 from abilities.constants import *
 
-# try:
-#     from flask import Flask
-# except:
-#     flask = None
-
 
 def test_basic_usage():
 
