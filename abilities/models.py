@@ -1,4 +1,4 @@
-from pycancan.constants import *
+from abilities.constants import *
 import inspect
 
 

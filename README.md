@@ -1,11 +1,11 @@
-pycancan (need better name)
+abilities
 ========
 
 Simple Declarative Authentication based on Ryan Bates excellent cancan library
 
 ## Installation
 
-`pip install pycancan`
+`pip install abilities`
 
 
 # Getting Started
@@ -17,8 +17,8 @@ User permissions are defined in an `method` decorated with `@authorize_method`
 A simple setup looks like so ...
 
 ```python
-from pycancan import authorization_method
-from pycancan.constants import *
+from abilities import authorization_method
+from abilities.constants import *
 from yourproject.models import Article
 
 @authorization_method

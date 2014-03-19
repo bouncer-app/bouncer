@@ -1,6 +1,6 @@
 __author__ = 'jtushman'
 
-from pycancan.models import Rule, Ability
+from abilities.models import Rule, Ability
 
 
 def authorization_method(original_method):

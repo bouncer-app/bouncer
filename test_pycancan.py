@@ -4,8 +4,8 @@ from nose.plugins.skip import SkipTest
 from nose.tools import *
 from nose.tools import assert_raises
 
-from pycancan import authorization_target, authorization_method, Ability
-from pycancan.constants import *
+from abilities import authorization_target, authorization_method, Ability
+from abilities.constants import *
 
 # try:
 #     from flask import Flask
