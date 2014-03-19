@@ -1,9 +1,14 @@
-from flask import request
+from flask import request, g
 from abilities import Ability
 
 class AuthorizationException(Exception):
     pass
 
+def get_current_user():
+    if hasattr(g, 'current_user'):
+        return g.current_user
+    else:
+        raise Exception("Excepting current_user on flask's g")
 
 
 class Condition(object):
@@ -12,11 +17,8 @@ class Condition(object):
         self.action = action
         self.subject = subject
 
-    def get_current_user(self):
-        return object()
-
-    def test(self, current_user):
-        ability = Ability(current_user)
+    def test(self):
+        ability = Ability(get_current_user())
         if ability.cannot(self.action, self.subject):
             raise AuthorizationException("User does not have access to resource")
 
@@ -34,8 +36,6 @@ class AbilityManager(object):
         self.authorization_target_callback = None
 
         self.authorization_method_callback = None
-
-        self._current_user_proxy = None
 
 
     def requires(self, *args):
@@ -71,17 +71,10 @@ class AbilityManager(object):
         Ability.set_authorization_method(self.authorization_method_callback)
         return callback
 
-    def current_user_proxy(self, method):
-        self._current_user_proxy = method
-        return method
-
-    @property
-    def current_user(self):
-        return self._current_user_proxy()
 
     def check_abilities(self):
         for condition in self.relevant_conditions_for_request():
-            condition.test(self.current_user)
+            condition.test()
 
     def relevant_conditions_for_request(self):
         return self.endpoint_dict.get(request.endpoint, dict())

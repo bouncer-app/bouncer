@@ -2,49 +2,12 @@ from flask import Flask, g
 from flask_abilities import AbilityManager, AuthorizationException
 from abilities.constants import *
 from nose.tools import *
-
-from contextlib import contextmanager
-from flask import appcontext_pushed
-
-
-
-# http://flask.pocoo.org/docs/testing/
-@contextmanager
-def user_set(app, user):
-    def handler(sender, **kwargs):
-        g.current_user = user
-    with appcontext_pushed.connected_to(handler, app):
-        yield
-
-class User(object):
-
-    def __init__(self, **kwargs):
-        self.id = kwargs.get('id', 1)
-        self.name = kwargs['name']
-        self.admin = kwargs['admin']
-        pass
-
-    @property
-    def is_admin(self):
-        return self.admin
+from .models import Article, TopSecretFile, User
+from .helpers import user_set
 
 app = Flask("basic")
 app.debug = True
 ability = AbilityManager(app)
-
-class Article(object):
-
-    def __init__(self, **kwargs):
-        self.author = kwargs['author']
-
-
-class TopSecretFile(object):
-    pass
-
-
-@ability.current_user_proxy
-def current_user():
-    return g.current_user
 
 
 @ability.authorization_method
