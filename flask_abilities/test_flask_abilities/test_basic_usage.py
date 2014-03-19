@@ -1,7 +1,20 @@
 from flask import Flask, url_for
-from flask_abilities import AbilityManager, requires_ability
+from flask_abilities import AbilityManager
 from abilities.constants import *
 from nose.tools import *
+
+
+class User(object):
+
+    def __init__(self, **kwargs):
+        self.id = kwargs.get('id', 1)
+        self.name = kwargs['name']
+        self.admin = kwargs['admin']
+        pass
+
+    @property
+    def is_admin(self):
+        return self.admin
 
 app = Flask("basic")
 ability = AbilityManager(app)
@@ -20,13 +33,17 @@ def authorize(user, abilities):
 
         abilities.append(EDIT, 'Article', if_author)
 
+@ability.current_user_proxy
+def current_user():
+    return User(name='jonathan', admin=False)
+
 
 @app.route("/")
 def hello():
     return "Hello World"
 
 @app.route("/articles")
-@requires_ability(READ, 'Article')
+@ability.requires(READ, 'Article')
 def articles_index():
     return "A bunch of articles"
 
@@ -43,3 +60,7 @@ def test_default():
     resp = client.get('/')
     eq_("Hello World", resp.data)
 
+
+def test_articles():
+    resp = client.get('/articles')
+    eq_("A bunch of articles", resp.data)
