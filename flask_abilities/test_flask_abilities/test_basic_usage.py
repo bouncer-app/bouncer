@@ -1,5 +1,5 @@
 from flask import Flask, g
-from flask_abilities import AbilityManager, AuthorizationException
+from flask_abilities import AbilityManager, AuthorizationException, check_authorization
 from abilities.constants import *
 from nose.tools import *
 from .models import Article, TopSecretFile, User
@@ -18,7 +18,7 @@ def authorize(user, abilities):
         abilities.append(MANAGE, ALL)
     else:
         abilities.append(READ, Article)
-        abilities.append(EDIT, Article, author=user)
+        abilities.append(EDIT, Article, author_id=user.id)
 
 
 @app.route("/")
@@ -38,28 +38,37 @@ def topsecret_index():
 
 @app.route("/article/<int:post_id>", methods=['POST'])
 def edit_post(post_id):
-    # article = Article.find(post_id)
-    # authorize(EDIT,article) raise 400 if not authorized
-    return "editing a post"
+
+    # Find an article form a db -- faking for testing
+    mary = User(name='mary', admin=False)
+    article = Article(author_id=mary.id)
+    check_authorization(EDIT, article)
+    # edit the post
+    return "successfully edited post"
 
 
 client = app.test_client()
 
 def test_default():
-    jonathan = User(name='jonathan',admin=False)
+    jonathan = User(name='jonathan', admin=False)
     with user_set(app, jonathan):
         resp = client.get('/')
         eq_("Hello World", resp.data)
 
-
 def test_allowed_index():
-    jonathan = User(name='jonathan',admin=False)
+    jonathan = User(name='jonathan', admin=False)
     with user_set(app, jonathan):
         resp = client.get('/articles')
         eq_("A bunch of articles", resp.data)
 
 def test_not_allowed_index():
-    jonathan = User(name='doug',admin=False)
-    with user_set(app, jonathan):
+    doug = User(name='doug', admin=False)
+    with user_set(app, doug):
         with assert_raises(AuthorizationException):
             resp = client.get('/topsecret')
+
+def test_securing_specific_object():
+    doug = User(name='doug', admin=False)
+    with user_set(app, doug):
+        with assert_raises(AuthorizationException):
+            resp = client.post('/article/1')

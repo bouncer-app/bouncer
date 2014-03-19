@@ -4,6 +4,13 @@ from abilities import Ability
 class AuthorizationException(Exception):
     pass
 
+
+def check_authorization(action, subject):
+    ability = Ability(get_current_user())
+    if ability.cannot(action, subject):
+        raise AuthorizationException("User does not have access to resource")
+
+
 def get_current_user():
     if hasattr(g, 'current_user'):
         return g.current_user
