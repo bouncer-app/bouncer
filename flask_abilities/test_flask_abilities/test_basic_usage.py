@@ -1,5 +1,5 @@
 from flask import Flask, url_for
-from flask_abilities import AbilityManager
+from flask_abilities import AbilityManager, requires_ability
 from abilities.constants import *
 from nose.tools import *
 
@@ -26,11 +26,14 @@ def hello():
     return "Hello World"
 
 @app.route("/articles")
+@requires_ability(READ, 'Article')
 def articles_index():
     return "A bunch of articles"
 
 @app.route("/article/<int:post_id>", methods=['POST'])
 def edit_post(post_id):
+    # article = Article.find(post_id)
+    # authorize(EDIT,article) raise 400 if not authorized
     return "editing a post"
 
 

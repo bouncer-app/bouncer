@@ -1,9 +1,23 @@
+from flask import g
 
 
 
+_temp_ability_cache = None
 
+def requires_ability(*args):
 
+    def decorator(f):
+        print "args: ", args
+        global _temp_ability_cache
+        if _temp_ability_cache is None:
+            _temp_ability_cache = dict()
 
+        _temp_ability_cache.setdefault(f.__name__, list())
+        _temp_ability_cache[f.__name__].append(args)
+
+        return f
+
+    return decorator
 
 
 class AbilityManager(object):
@@ -20,7 +34,7 @@ class AbilityManager(object):
 
     def init_app(self,app):
         # I am sure that we will need to put something in here soon
-        pass
+        app.before_request(self.check_abilities)
 
     def authorization_target(self, callback):
         """
@@ -36,3 +50,6 @@ class AbilityManager(object):
         """
         self.authorization_method_callback = callback
         return callback
+
+    def check_abilities(self):
+        pass
