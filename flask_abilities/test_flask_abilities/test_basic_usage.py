@@ -1,5 +1,5 @@
-from flask import Flask, g
-from flask_abilities import AbilityManager, AuthorizationException, authorize
+from flask import Flask
+from flask_abilities import AbilityManager, authorize
 from abilities.constants import *
 from nose.tools import *
 from .models import Article, TopSecretFile, User
@@ -64,11 +64,11 @@ def test_allowed_index():
 def test_not_allowed_index():
     doug = User(name='doug', admin=False)
     with user_set(app, doug):
-        with assert_raises(AuthorizationException):
-            resp = client.get('/topsecret')
+        resp = client.get('/topsecret')
+        eq_(resp.status_code, 401)
 
 def test_securing_specific_object():
     doug = User(name='doug', admin=False)
     with user_set(app, doug):
-        with assert_raises(AuthorizationException):
-            resp = client.post('/article/1')
+        resp = client.post('/article/1')
+        eq_(resp.status_code, 401)

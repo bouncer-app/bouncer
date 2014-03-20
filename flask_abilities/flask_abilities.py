@@ -1,14 +1,12 @@
 from flask import request, g
+from werkzeug.exceptions import Unauthorized
 from abilities import Ability
-
-class AuthorizationException(Exception):
-    pass
 
 
 def authorize(action, subject):
     ability = Ability(get_current_user())
     if ability.cannot(action, subject):
-        raise AuthorizationException("User does not have access to resource")
+        raise Unauthorized("User does not have access to resource")
 
 
 def get_current_user():
@@ -27,7 +25,7 @@ class Condition(object):
     def test(self):
         ability = Ability(get_current_user())
         if ability.cannot(self.action, self.subject):
-            raise AuthorizationException("User does not have access to resource")
+            raise Unauthorized("User does not have access to resource")
 
 
 
