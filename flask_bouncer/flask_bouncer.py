@@ -3,7 +3,7 @@ from werkzeug.exceptions import Unauthorized
 from bouncer import Ability
 
 
-def authorize(action, subject):
+def bounce(action, subject):
     ability = Ability(get_current_user())
     if ability.cannot(action, subject):
         raise Unauthorized("User does not have access to resource")
@@ -29,7 +29,7 @@ class Condition(object):
 
 
 
-class AbilityManager(object):
+class Bouncer(object):
     """Thie class is used to control the Abilities Integration to one or more Flask applications"""
 
     def __init__(self, app):

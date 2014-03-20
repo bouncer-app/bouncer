@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_bouncer import AbilityManager, authorize
+from flask_bouncer import Bouncer, bounce
 from bouncer.constants import *
 from nose.tools import *
 from .models import Article, TopSecretFile, User
@@ -7,10 +7,10 @@ from .helpers import user_set
 
 app = Flask("basic")
 app.debug = True
-ability = AbilityManager(app)
+bouncer = Bouncer(app)
 
 
-@ability.authorization_method
+@bouncer.authorization_method
 def define_authorization(user, abilities):
 
     if user.is_admin:
@@ -26,12 +26,12 @@ def hello():
     return "Hello World"
 
 @app.route("/articles")
-@ability.requires(READ, Article)
+@bouncer.requires(READ, Article)
 def articles_index():
     return "A bunch of articles"
 
 @app.route("/topsecret")
-@ability.requires(READ, TopSecretFile)
+@bouncer.requires(READ, TopSecretFile)
 def topsecret_index():
     return "A bunch of top secret stuff that only admins should see"
 
@@ -42,7 +42,9 @@ def edit_post(post_id):
     # Find an article form a db -- faking for testing
     mary = User(name='mary', admin=False)
     article = Article(author_id=mary.id)
-    authorize(EDIT, article)
+
+    # bounce them out if they do not have access
+    bounce(EDIT, article)
     # edit the post
     return "successfully edited post"
 
