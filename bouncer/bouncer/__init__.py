@@ -1,6 +1,6 @@
 __author__ = 'jtushman'
 
-from abilities.models import Rule, Ability
+from bouncer.models import Rule, Ability
 
 
 def authorization_method(original_method):

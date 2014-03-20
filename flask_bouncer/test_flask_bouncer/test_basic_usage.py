@@ -1,6 +1,6 @@
 from flask import Flask
-from flask_abilities import AbilityManager, authorize
-from abilities.constants import *
+from flask_bouncer import AbilityManager, authorize
+from bouncer.constants import *
 from nose.tools import *
 from .models import Article, TopSecretFile, User
 from .helpers import user_set

@@ -1,11 +1,7 @@
-import nose
-import inspect
-from nose.plugins.skip import SkipTest
-from nose.tools import *
 from nose.tools import assert_raises
 
-from abilities import authorization_target, authorization_method, Ability
-from abilities.constants import *
+from bouncer import authorization_target, authorization_method, Ability
+from bouncer.constants import *
 
 
 def test_basic_usage():

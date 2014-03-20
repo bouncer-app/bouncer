@@ -1,11 +1,11 @@
-abilities
+bouncer
 ========
 
 Simple Declarative Authentication based on Ryan Bates excellent cancan library
 
 ## Installation
 
-`pip install abilities`
+`pip install bouncer`
 
 
 # Getting Started

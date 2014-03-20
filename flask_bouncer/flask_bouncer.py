@@ -1,6 +1,6 @@
 from flask import request, g
 from werkzeug.exceptions import Unauthorized
-from abilities import Ability
+from bouncer import Ability
 
 
 def authorize(action, subject):

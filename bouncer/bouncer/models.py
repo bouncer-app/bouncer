@@ -1,4 +1,4 @@
-from abilities.constants import *
+from bouncer.constants import *
 import inspect
 
 
