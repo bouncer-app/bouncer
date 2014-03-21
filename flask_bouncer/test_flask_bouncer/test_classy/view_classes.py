@@ -1,5 +1,7 @@
 from flask_classy import FlaskView, route
 from test_flask_bouncer.models import Article
+from flask_bouncer import requires
+from bouncer.constants import *
 
 
 class ArticleView(FlaskView):
@@ -27,7 +29,8 @@ class ArticleView(FlaskView):
     def delete(self, id):
         return "Delete " + id
 
-    def custom_method(self):
+    @requires(READ, Article)
+    def custom_read_method(self):
         return "Custom Method"
 
     def custom_method_with_params(self, p_one, p_two):

@@ -1,7 +1,20 @@
-from flask import request, g
+from flask import request, g, current_app
 from werkzeug.exceptions import Unauthorized
 from bouncer import Ability
 
+
+def requires(*args):
+
+    def decorator(f):
+        # print "args: ", args
+        # print "is this the endpoint: {}".format(f.__name__)
+
+        #endpoint_dict.setdefault(f.__name__, list())
+        #endpoint_dict[f.__name__].append(Condition(*args))
+
+        return f
+
+    return decorator
 
 def bounce(action, subject):
     current_user = get_current_user()
@@ -56,6 +69,7 @@ class Bouncer(object):
         return decorator
 
     def init_app(self, app):
+        app.bouncer = self
         app.before_request(self.check_abilities)
 
 

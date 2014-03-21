@@ -11,7 +11,7 @@ app = Flask("classy")
 bouncer = Bouncer(app)
 ArticleView.register(app)
 
-# Which classy views do you want to lock down
+# Which classy views do you want to lock down, you can pass multiple
 bouncer.bounce(ArticleView)
 
 @bouncer.authorization_method
@@ -41,19 +41,6 @@ def test_index():
         resp = client.get("/article/")
         eq_(b"Index", resp.data)
 
-
-# def test_get():
-#     resp = client.get("/article/1234")
-#     eq_(b"Get 1234", resp.data)
-#
-# def test_put():
-#     resp = client.put("/article/1234")
-#     eq_(b"Put 1234", resp.data)
-#
-# def test_patch():
-#     resp = client.patch("/article/1234")
-#     eq_(b"Patch 1234", resp.data)
-
 def test_post():
     # Admin should be able to create articles
     with user_set(app, jonathan):
@@ -76,6 +63,18 @@ def test_delete():
     with user_set(app, nancy):
         resp = client.delete("/article/1234")
         eq_(resp.status_code, 401)
+
+# def test_get():
+#     resp = client.get("/article/1234")
+#     eq_(b"Get 1234", resp.data)
+#
+# def test_put():
+#     resp = client.put("/article/1234")
+#     eq_(b"Put 1234", resp.data)
+#
+# def test_patch():
+#     resp = client.patch("/article/1234")
+#     eq_(b"Patch 1234", resp.data)
 
 # def test_custom_method():
 #     resp = client.get("/article/custom_method/")
