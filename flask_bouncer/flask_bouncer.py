@@ -4,9 +4,11 @@ from bouncer import Ability
 
 
 def bounce(action, subject):
-    ability = Ability(get_current_user())
+    current_user = get_current_user()
+    ability = Ability(current_user)
     if ability.cannot(action, subject):
-        raise Unauthorized("User does not have access to resource")
+        msg = "{} does not have {} access to {}".format(current_user, action, subject)
+        raise Unauthorized(msg)
 
 
 def get_current_user():
@@ -23,10 +25,7 @@ class Condition(object):
         self.subject = subject
 
     def test(self):
-        ability = Ability(get_current_user())
-        if ability.cannot(self.action, self.subject):
-            raise Unauthorized("User does not have access to resource")
-
+        bounce(self.action, self.subject)
 
 
 class Bouncer(object):
@@ -39,6 +38,8 @@ class Bouncer(object):
         self.endpoint_dict = dict()
 
         self.authorization_method_callback = None
+
+        self.flask_classy_classes = None
 
 
     def requires(self, *args):
@@ -58,6 +59,12 @@ class Bouncer(object):
         app.before_request(self.check_abilities)
 
 
+    def bounce(self, *classy_routes):
+        if self.flask_classy_classes is None:
+            self.flask_classy_classes = list()
+        self.flask_classy_classes.extend(classy_routes)
+
+
     def authorization_method(self, callback):
         """
         the callback for defining user abilities
@@ -71,5 +78,33 @@ class Bouncer(object):
         for condition in self.relevant_conditions_for_request():
             condition.test()
 
+    def classy_conditions_for_request(self):
+        if ':' not in request.endpoint:
+            return list()
+
+        parts = request.endpoint.split(':')
+        if not len(parts) == 2:
+            return list()
+
+        class_name = parts[0]
+        action_name = parts[1]
+
+        classy_class = next((clazz for clazz in self.flask_classy_classes if clazz.__name__ == class_name), None)
+
+        if not classy_class:
+            return list()
+
+        target_model = None
+        if hasattr(classy_class, '__target_model__'):
+            target_model = classy_class.__target_model__
+        else:
+            raise NotImplementedError('We will get to this -- but will inspect the class name to determine which model we care about')
+
+        return [Condition(action_name, target_model)]
+
+
     def relevant_conditions_for_request(self):
-        return self.endpoint_dict.get(request.endpoint, dict())
+        conditions = list()
+        conditions.extend(self.endpoint_dict.get(request.endpoint, dict()))
+        conditions.extend(self.classy_conditions_for_request())
+        return conditions

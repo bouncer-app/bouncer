@@ -140,9 +140,9 @@ class Ability(object):
     @property
     def default_alias_actions(self):
         return {
-            READ: [INDEX, SHOW],
-            CREATE: [NEW],
-            UPDATE: [EDIT]
+            READ: [INDEX, SHOW, GET],
+            CREATE: [NEW, PUT, POST],
+            UPDATE: [EDIT, PATCH]
         }
 
 
