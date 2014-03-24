@@ -128,8 +128,7 @@ For example:
 
 ------------
 
-If you use flask, checkout: [flask-bouncer](https://github.com/jtushman/flask-bouncer).
-In my opinion this is where it gets good!
+If you use flask, I am currently working on a flask extension -- follow its progess here: [flask-bouncer](https://github.com/jtushman/flask-bouncer).
 
 
 ## Questions / Issues
