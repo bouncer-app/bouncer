@@ -1,4 +1,1 @@
 nose
-flask
-blinker
-flask-classy
