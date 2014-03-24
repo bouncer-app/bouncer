@@ -1,4 +1,4 @@
-bouncer
+bouncer (ALPHA)
 ========
 
 Simple Declarative Authentication DSL based on Ryan Bates excellent cancan library
@@ -76,7 +76,23 @@ def authorize(user, they):
         they.can(EDIT, Article, if_author)
 ```
 
-See [Defining Abilities](#) for details
+You can also use an alternative `dict` syntax.  The following is equivalent to above:
+```python
+from bouncer import authorization_method
+from bouncer.constants import *
+from yourproject.models import Article
+
+@authorization_method
+def authorize(user, they):
+
+    if user.is_admin:
+        they.can(MANAGE, ALL)
+    else:
+        they.can(READ, ALL)
+        they.can(EDIT, Article, author=user)
+```
+
+
 
 ## 2. Check Abilities & Authorization
 
@@ -109,4 +125,13 @@ For example:
     print marc.can(EDIT,article)       # False
 ```
 
+
+------------
+
+If you use flask, checkout: [flask-bouncer](https://github.com/jtushman/flask-bouncer).
+In my opinion this is where it gets good!
+
+
+## Questions / Issues
+Feel free to ping me on twitter: [@tushman](http://twitter.com/tushman) or add issues or PRs at [https://github.com/jtushman/bouncer](https://github.com/jtushman/state_machine)
 
