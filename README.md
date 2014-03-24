@@ -3,6 +3,8 @@ bouncer
 
 Simple Declarative Authentication based on Ryan Bates excellent cancan library
 
+[![Build Status](https://travis-ci.org/jtushman/bouncer.svg)](https://travis-ci.org/jtushman/bouncer)
+
 ## Installation
 
 `pip install bouncer`
