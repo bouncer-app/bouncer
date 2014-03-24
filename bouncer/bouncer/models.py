@@ -84,6 +84,23 @@ class RuleList(list):
             item = Rule(True, *item_description_or_rule, **kwargs)
             super(RuleList, self).append(item)
 
+    # alias append
+    # so you can do things like this:
+    #     @authorization_method
+    # def authorize(user, they):
+    #
+    #     if user.is_admin:
+    #         # self.can_manage(ALL)
+    #         they.can(MANAGE, ALL)
+    #     else:
+    #         they.can(READ, ALL)
+    #
+    #         def if_author(article):
+    #             return article.author == user
+    #
+    #         they.can(EDIT, Article, if_author)
+    can = append
+
 
 class Ability(object):
 
