@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_bouncer import Bouncer, bounce
+from flask_bouncer import Bouncer, bounce, requires
 from bouncer.constants import *
 from nose.tools import *
 from .models import Article, TopSecretFile, User
@@ -11,27 +11,28 @@ bouncer = Bouncer(app)
 
 
 @bouncer.authorization_method
-def define_authorization(user, abilities):
+def define_authorization(user, they):
 
     if user.is_admin:
         # self.can_manage(ALL)
-        abilities.append(MANAGE, ALL)
+        they.can(MANAGE, ALL)
     else:
-        abilities.append(READ, Article)
-        abilities.append(EDIT, Article, author_id=user.id)
+        they.can(READ, Article)
+        they.can(EDIT, Article, author_id=user.id)
 
 
 @app.route("/")
 def hello():
     return "Hello World"
 
+
 @app.route("/articles")
-@bouncer.requires(READ, Article)
+@requires(READ, Article)
 def articles_index():
     return "A bunch of articles"
 
 @app.route("/topsecret")
-@bouncer.requires(READ, TopSecretFile)
+@requires(READ, TopSecretFile)
 def topsecret_index():
     return "A bunch of top secret stuff that only admins should see"
 

@@ -1,20 +1,8 @@
 from flask import request, g, current_app
 from werkzeug.exceptions import Unauthorized
+from functools import wraps
 from bouncer import Ability
 
-
-def requires(*args):
-
-    def decorator(f):
-        # print "args: ", args
-        # print "is this the endpoint: {}".format(f.__name__)
-
-        #endpoint_dict.setdefault(f.__name__, list())
-        #endpoint_dict[f.__name__].append(Condition(*args))
-
-        return f
-
-    return decorator
 
 def bounce(action, subject):
     current_user = get_current_user()
@@ -41,37 +29,23 @@ class Condition(object):
         bounce(self.action, self.subject)
 
 
+def requires(action, subject):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            Condition(action, subject).test()
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
 class Bouncer(object):
     """Thie class is used to control the Abilities Integration to one or more Flask applications"""
 
     def __init__(self, app):
         self.app = app
-        self.init_app(app)
-
-        self.endpoint_dict = dict()
+        app.bouncer = self
 
         self.authorization_method_callback = None
-
-        self.flask_classy_classes = None
-
-
-    def requires(self, *args):
-
-        def decorator(f):
-            # print "args: ", args
-            # print "is this the endpoint: {}".format(f.__name__)
-
-            self.endpoint_dict.setdefault(f.__name__, list())
-            self.endpoint_dict[f.__name__].append(Condition(*args))
-
-            return f
-
-        return decorator
-
-    def init_app(self, app):
-        app.bouncer = self
-        app.before_request(self.check_abilities)
-
 
     def bounce(self, *classy_routes):
         if self.flask_classy_classes is None:
@@ -86,39 +60,3 @@ class Bouncer(object):
         self.authorization_method_callback = callback
         Ability.set_authorization_method(self.authorization_method_callback)
         return callback
-
-
-    def check_abilities(self):
-        for condition in self.relevant_conditions_for_request():
-            condition.test()
-
-    def classy_conditions_for_request(self):
-        if ':' not in request.endpoint:
-            return list()
-
-        parts = request.endpoint.split(':')
-        if not len(parts) == 2:
-            return list()
-
-        class_name = parts[0]
-        action_name = parts[1]
-
-        classy_class = next((clazz for clazz in self.flask_classy_classes if clazz.__name__ == class_name), None)
-
-        if not classy_class:
-            return list()
-
-        target_model = None
-        if hasattr(classy_class, '__target_model__'):
-            target_model = classy_class.__target_model__
-        else:
-            raise NotImplementedError('We will get to this -- but will inspect the class name to determine which model we care about')
-
-        return [Condition(action_name, target_model)]
-
-
-    def relevant_conditions_for_request(self):
-        conditions = list()
-        conditions.extend(self.endpoint_dict.get(request.endpoint, dict()))
-        conditions.extend(self.classy_conditions_for_request())
-        return conditions
