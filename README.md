@@ -1,14 +1,47 @@
 bouncer
 ========
 
-Simple Declarative Authentication based on Ryan Bates excellent cancan library
+Simple Declarative Authentication DSL based on Ryan Bates excellent cancan library
 
 [![Build Status](https://travis-ci.org/jtushman/bouncer.svg)](https://travis-ci.org/jtushman/bouncer)
 
 ## Introduction
 
-Meet **bouncer**.  **bouncer** is your faithful servant.  Big, burly, trustworthy -- not the sharpest tool in the box,
-but very effective in what he does.  You just have to talk simply to him
+Meet **bouncer**.
+
+**bouncer** is your faithful servant.  Big, burly, trustworthy -- not the sharpest tool in the box,
+but very effective in what he does.  You just have to talk simply to him.  For example:
+
+```python
+from bouncer import authorization_method
+from bouncer.constants import *
+from yourproject.models import Article
+
+@authorization_method
+def authorize(user, they):
+
+    if user.is_admin:
+        they.can(MANAGE, ALL)
+    else:
+        they.can(READ, ALL)
+
+        def if_author(article):
+            return article.author == user
+
+        they.can(EDIT, Article, if_author)
+```
+
+And once you have that setup, you can ask questions like:
+
+```
+    jonathan = User(name='jonathan',admin=False)
+    marc = User(name='marc',admin=False)
+
+    article = Article(author=jonathan)
+
+    print jonathan.can(EDIT,article)   # True
+    print marc.can(EDIT,article)       # False
+```
 
 
 ## Installation
@@ -25,23 +58,22 @@ User permissions are defined in an `method` decorated with `@authorize_method`
 A simple setup looks like so ...
 
 ```python
-from abilities import authorization_method
-from abilities.constants import *
+from bouncer import authorization_method
+from bouncer.constants import *
 from yourproject.models import Article
 
 @authorization_method
-def authorize(user, abilities):
+def authorize(user, they):
 
     if user.is_admin:
-        # self.can_manage(ALL)
-        abilities.append(MANAGE, ALL)
+        they.can(MANAGE, ALL)
     else:
-        abilities.append(READ, ALL)
+        they.can(READ, ALL)
 
         def if_author(article):
             return article.author == user
 
-        abilities.append(EDIT, Article, if_author)
+        they.can(EDIT, Article, if_author)
 ```
 
 See [Defining Abilities](#) for details
@@ -53,6 +85,8 @@ Helper methods are mixed into your User model (once it is decorated with the `@a
 For example:
 
 ```python
+    from bouncer import authorization_target
+
     @authorization_target
     class User(object):
 
