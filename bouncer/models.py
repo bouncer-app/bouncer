@@ -54,7 +54,7 @@ class Rule(object):
             return self.matches_function_conditions(action, subject)
 
     def matches_dict_conditions(self, action, subject):
-        return all(self.matches_hash_condition(subject, key, value) for key, value in self.conditions.iteritems())
+        return all(self.matches_hash_condition(subject, key, self.conditions[key]) for key in self.conditions)
 
     def matches_hash_condition(self, subject, key, value):
         return getattr(subject, key) == value
