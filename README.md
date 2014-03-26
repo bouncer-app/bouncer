@@ -76,7 +76,10 @@ def authorize(user, they):
         they.can(EDIT, Article, if_author)
 ```
 
-You can also use an alternative `dict` syntax.  The following is equivalent to above:
+### Alternative syntax
+
+* You can also use an alternative `dict` syntax.  The following is equivalent to above:
+
 ```python
 from bouncer import authorization_method
 from bouncer.constants import *
@@ -90,6 +93,48 @@ def authorize(user, they):
     else:
         they.can(READ, ALL)
         they.can(EDIT, Article, author=user)
+```
+
+* Use can use Strings instead of classes (so you do not need to import a bunch of files you are not using in initialization
+
+```python
+from bouncer import authorization_method
+from bouncer.constants import *
+
+@authorization_method
+def authorize(user, they):
+
+    if user.is_admin:
+        they.can(MANAGE, ALL)
+    else:
+        they.can(READ, ALL)
+
+        # See I am using a string here
+        they.can(EDIT, 'Article', author=user)
+```
+
+* If you do not think the "they.can" is pythonic enough you can use the appened syntax
+
+```python
+from bouncer import authorization_method
+from bouncer.constants import *
+
+@authorization_method
+def authorize(user, abilities):
+
+    if user.is_admin:
+        abilities.append(MANAGE, ALL)
+    else:
+        abilities.append(READ, ALL)
+
+        # See I am using a string here
+        abilities.append(EDIT, 'Article', author=user)
+```
+
+* You can (are encouraged to) combine similar rules on a single line:
+
+```python
+       they.can((EDIT,READ,DELETE),(Article,Photo))
 ```
 
 
