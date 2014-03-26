@@ -115,7 +115,7 @@ class Ability(object):
 
 
     def can(self, action, subject):
-        print "Can {} {} on {}".format(self.user, action, subject)
+        # print "Can {} {} on {}".format(self.user, action, subject)
         return any(rule.matches_conditions(action, subject) for rule in self.relevant_rules_for_match(action, subject))
 
     def cannot(self, action, subject):
