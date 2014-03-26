@@ -64,10 +64,9 @@ class Rule(object):
 
     def matches_subject_class(self, subject):
         for sub in self.subjects:
-            if inspect.isclass(sub):
-                if isinstance(subject, sub) or \
-                                subject.__class__.__name__ == str(sub) or \
-                                inspect.isclass(subject) and issubclass(subject, sub):
+            if (inspect.isclass(sub) and isinstance(subject, sub)) or \
+                subject.__class__.__name__ == str(sub) or \
+                    (inspect.isclass(subject) and issubclass(subject, sub)):
                     return True
         return False
 
@@ -116,7 +115,7 @@ class Ability(object):
 
 
     def can(self, action, subject):
-        # print "Can {} {} on {}".format(self.user, action, subject)
+        print "Can {} {} on {}".format(self.user, action, subject)
         return any(rule.matches_conditions(action, subject) for rule in self.relevant_rules_for_match(action, subject))
 
     def cannot(self, action, subject):
