@@ -103,15 +103,28 @@ class RuleList(list):
 
 class Ability(object):
 
-    @classmethod
-    def set_authorization_method(cls, authorization_method):
-        setattr(cls, 'authorize', staticmethod(authorization_method))
-
-
-    def __init__(self, user):
+    def __init__(self, user, authorization_method=None):
+        from . import get_authorization_method
         self.rules = RuleList()
         self.user = user
-        Ability.authorize(user, self.rules)
+        self._aliased_actions = self.default_alias_actions
+
+        if authorization_method is not None:
+            self.authorization_method = authorization_method
+        else:
+            # see if one has been set globaly
+            self.authorization_method = get_authorization_method()
+
+    @property
+    def authorization_method(self):
+        return self._authorization_method
+
+    @authorization_method.setter
+    def authorization_method(self, value):
+        self._authorization_method = value
+        # Now that we have it run use it to set the rules
+        if self._authorization_method is not None:
+            self._authorization_method(self.user, self.rules)
 
 
     def can(self, action, subject):
@@ -150,16 +163,21 @@ class Ability(object):
 
     @property
     def aliased_actions(self):
-        return self.default_alias_actions
+        return self._aliased_actions
+
+    @aliased_actions.setter
+    def aliased_actions(self, value):
+        self._aliased_actions = value
 
 
     @property
     def default_alias_actions(self):
         return {
-            READ: [INDEX, SHOW, GET],
-            CREATE: [NEW, PUT, POST],
-            UPDATE: [EDIT, PATCH]
+            READ: [INDEX, SHOW],
+            CREATE: [NEW],
+            UPDATE: [EDIT]
         }
+
 
 
 
