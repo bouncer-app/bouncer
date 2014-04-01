@@ -1,7 +1,7 @@
 bouncer
 ========
 
-Simple Declarative Authentication DSL based on Ryan Bates excellent cancan library
+Simple Declarative Authentication DSL inspired by Ryan Bates' excellent cancan library
 
 [![Build Status](https://travis-ci.org/jtushman/bouncer.svg)](https://travis-ci.org/jtushman/bouncer)
 
