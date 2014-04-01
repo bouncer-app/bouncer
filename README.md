@@ -161,7 +161,7 @@ print marc.can(EDIT,article)       # False
 ```
 ------------
 
-If you use flask, I am currently working on a flask extension -- follow its progress here: [flask-bouncer](https://github.com/jtushman/flask-bouncer).
+If you use Flask, I am currently working on a Flask extension -- follow its progress here: [flask-bouncer](https://github.com/jtushman/flask-bouncer).
 
 
 ## Questions / Issues
