@@ -1,4 +1,4 @@
-bouncer (ALPHA)
+bouncer
 ========
 
 Simple Declarative Authentication DSL based on Ryan Bates excellent cancan library
@@ -9,13 +9,12 @@ Simple Declarative Authentication DSL based on Ryan Bates excellent cancan libra
 
 Meet **bouncer**.
 
-**bouncer** is your faithful servant.  Big, burly, trustworthy -- not the sharpest tool in the box,
+**bouncer** is your faithful servant.  Big, burly, trustworthy -- smarter than he looks,
 but very effective in what he does.  You just have to talk simply to him.  For example:
 
 ```python
 from bouncer import authorization_method
 from bouncer.constants import *
-from yourproject.models import Article
 
 @authorization_method
 def authorize(user, they):
@@ -28,7 +27,7 @@ def authorize(user, they):
         def if_author(article):
             return article.author == user
 
-        they.can(EDIT, Article, if_author)
+        they.can(EDIT, 'Article', if_author)
 ```
 
 And once you have that setup, you can ask questions like:
@@ -39,8 +38,12 @@ And once you have that setup, you can ask questions like:
 
     article = Article(author=jonathan)
 
-    print jonathan.can(EDIT,article)   # True
-    print marc.can(EDIT,article)       # False
+    print jonathan.can(EDIT, article)   # True
+    print marc.can(EDIT, article)       # False
+    
+    # Can Marc view articles in general?
+    print marc.can(VIEW, Article)       # True
+    
 ```
 
 
@@ -48,8 +51,6 @@ And once you have that setup, you can ask questions like:
 
 `pip install bouncer`
 
-
-# Getting Started
 
 ## 1. Defining Abilities
 
@@ -95,6 +96,14 @@ def authorize(user, they):
         they.can(EDIT, Article, author=user)
 ```
 
+* You can add multiple conditions to the `dict`:
+
+```python
+		they.can(READ, Article, published=True, active=True)
+```
+
+
+
 * Use can use Strings instead of classes (so you do not need to import a bunch of files you are not using in initialization
 
 ```python
@@ -109,11 +118,11 @@ def authorize(user, they):
     else:
         they.can(READ, ALL)
 
-        # See I am using a string here
+        # Notice that I am using a string here
         they.can(EDIT, 'Article', author=user)
 ```
 
-* If you do not think the "they.can" is pythonic enough you can use the appened syntax
+* If you do not think the "they.can" is pythonic enough you can use the append syntax
 
 ```python
 from bouncer import authorization_method
@@ -153,8 +162,8 @@ For example:
 
         def __init__(self, **kwargs):
             self.id = kwargs.get('id', 1)
-            self.name = kwargs['name']
-            self.admin = kwargs['admin']
+            self.name = kwargs.get('name', '')
+            self.admin = kwargs.get('name', False)
             pass
 
         @property
@@ -173,9 +182,9 @@ For example:
 
 ------------
 
-If you use flask, I am currently working on a flask extension -- follow its progess here: [flask-bouncer](https://github.com/jtushman/flask-bouncer).
+If you use flask, I am currently working on a flask extension -- follow its progress here: [flask-bouncer](https://github.com/jtushman/flask-bouncer).
 
 
 ## Questions / Issues
-Feel free to ping me on twitter: [@tushman](http://twitter.com/tushman) or add issues or PRs at [https://github.com/jtushman/bouncer](https://github.com/jtushman/state_machine)
+Feel free to ping me on twitter: [@tushman](http://twitter.com/tushman) or add issues or PRs at [https://github.com/jtushman/bouncer](https://github.com/jtushman/bouncer)
 

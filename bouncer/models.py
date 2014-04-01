@@ -48,6 +48,10 @@ class Rule(object):
         # print "Matching Conditions on {} for {}".format(action, subject)
         if self.conditions is None:
             return True
+        elif inspect.isclass(subject):
+            # IMPORTANT we only check conditions if we are testing specific instances of a class NOT of the classes
+            # themselves
+            return True
         elif isinstance(self.conditions, dict):
             return self.matches_dict_conditions(action, subject)
         else:
