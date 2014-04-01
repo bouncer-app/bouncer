@@ -32,17 +32,17 @@ def authorize(user, they):
 
 And once you have that setup, you can ask questions like:
 
-```
-    jonathan = User(name='jonathan',admin=False)
-    marc = User(name='marc',admin=False)
+```python
+jonathan = User(name='jonathan',admin=False)
+marc = User(name='marc',admin=False)
 
-    article = Article(author=jonathan)
+article = Article(author=jonathan)
 
-    print jonathan.can(EDIT, article)   # True
-    print marc.can(EDIT, article)       # False
-    
-    # Can Marc view articles in general?
-    print marc.can(VIEW, Article)       # True
+print jonathan.can(EDIT, article)   # True
+print marc.can(EDIT, article)       # False
+
+# Can Marc view articles in general?
+print marc.can(VIEW, Article)       # True
     
 ```
 
@@ -51,18 +51,13 @@ And once you have that setup, you can ask questions like:
 
 `pip install bouncer`
 
-
 ## 1. Defining Abilities
 
-User permissions are defined in an `method` decorated with `@authorize_method`
+User permissions are defined in an method decorated with `@authorize_method`
 
 A simple setup looks like so ...
 
 ```python
-from bouncer import authorization_method
-from bouncer.constants import *
-from yourproject.models import Article
-
 @authorization_method
 def authorize(user, they):
 
@@ -79,13 +74,9 @@ def authorize(user, they):
 
 ### Alternative syntax
 
-* You can also use an alternative `dict` syntax.  The following is equivalent to above:
+#### You can also use an alternative `dict` syntax.  The following is equivalent to above:
 
 ```python
-from bouncer import authorization_method
-from bouncer.constants import *
-from yourproject.models import Article
-
 @authorization_method
 def authorize(user, they):
 
@@ -96,20 +87,15 @@ def authorize(user, they):
         they.can(EDIT, Article, author=user)
 ```
 
-* You can add multiple conditions to the `dict`:
+#### You can add multiple conditions to the `dict`:
 
 ```python
-		they.can(READ, Article, published=True, active=True)
+they.can(READ, Article, published=True, active=True)
 ```
 
-
-
-* Use can use Strings instead of classes (so you do not need to import a bunch of files you are not using in initialization
+#### Use can use Strings instead of classes (so you do not need to import a bunch of files you are not using in initialization
 
 ```python
-from bouncer import authorization_method
-from bouncer.constants import *
-
 @authorization_method
 def authorize(user, they):
 
@@ -122,12 +108,9 @@ def authorize(user, they):
         they.can(EDIT, 'Article', author=user)
 ```
 
-* If you do not think the "they.can" is pythonic enough you can use the append syntax
+#### If you do not think the "they.can" is pythonic enough you can use the append syntax
 
 ```python
-from bouncer import authorization_method
-from bouncer.constants import *
-
 @authorization_method
 def authorize(user, abilities):
 
@@ -140,13 +123,11 @@ def authorize(user, abilities):
         abilities.append(EDIT, 'Article', author=user)
 ```
 
-* You can (are encouraged to) combine similar rules on a single line:
+#### You can (are encouraged to) combine similar rules on a single line:
 
 ```python
-       they.can((EDIT,READ,DELETE),(Article,Photo))
+they.can((EDIT,READ,DELETE),(Article,Photo))
 ```
-
-
 
 ## 2. Check Abilities & Authorization
 
@@ -155,31 +136,29 @@ Helper methods are mixed into your User model (once it is decorated with the `@a
 For example:
 
 ```python
-    from bouncer import authorization_target
+from bouncer import authorization_target
 
-    @authorization_target
-    class User(object):
+@authorization_target
+class User(object):
 
-        def __init__(self, **kwargs):
-            self.id = kwargs.get('id', 1)
-            self.name = kwargs.get('name', '')
-            self.admin = kwargs.get('name', False)
-            pass
+def __init__(self, **kwargs):
+    self.id = kwargs.get('id', 1)
+    self.name = kwargs.get('name', '')
+    self.admin = kwargs.get('name', False)
+    pass
 
-        @property
-        def is_admin(self):
-            return self.admin
-            
-    jonathan = User(name='jonathan',admin=False)
-    marc = User(name='marc',admin=False)
+@property
+def is_admin(self):
+    return self.admin
     
-    article = Article(author=jonathan)
-    
-    print jonathan.can(EDIT,article)   # True
-    print marc.can(EDIT,article)       # False
+jonathan = User(name='jonathan',admin=False)
+marc = User(name='marc',admin=False)
+
+article = Article(author=jonathan)
+
+print jonathan.can(EDIT,article)   # True
+print marc.can(EDIT,article)       # False
 ```
-
-
 ------------
 
 If you use flask, I am currently working on a flask extension -- follow its progress here: [flask-bouncer](https://github.com/jtushman/flask-bouncer).
