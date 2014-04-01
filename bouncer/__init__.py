@@ -4,11 +4,13 @@ from bouncer.models import Rule, Ability
 
 _authorization_method = None
 
+
 def authorization_method(original_method):
     """The method that will be injected into the authorization target to perform authorization"""
     global _authorization_method
     _authorization_method = original_method
     return original_method
+
 
 def get_authorization_method():
     return _authorization_method

@@ -45,7 +45,6 @@ class Rule(object):
 
     # Matches the conditions
     def matches_conditions(self, action, subject):
-        # print "Matching Conditions on {} for {}".format(action, subject)
         if self.conditions is None:
             return True
         elif inspect.isclass(subject):
@@ -130,7 +129,6 @@ class Ability(object):
         if self._authorization_method is not None:
             self._authorization_method(self.user, self.rules)
 
-
     def can(self, action, subject):
         # print "Can {} {} on {}".format(self.user, action, subject)
         return any(rule.matches_conditions(action, subject) for rule in self.relevant_rules_for_match(action, subject))
@@ -164,7 +162,6 @@ class Ability(object):
 
         return results
 
-
     @property
     def aliased_actions(self):
         return self._aliased_actions
@@ -173,7 +170,6 @@ class Ability(object):
     def aliased_actions(self, value):
         self._aliased_actions = value
 
-
     @property
     def default_alias_actions(self):
         return {
@@ -181,7 +177,3 @@ class Ability(object):
             CREATE: [NEW],
             UPDATE: [EDIT]
         }
-
-
-
-

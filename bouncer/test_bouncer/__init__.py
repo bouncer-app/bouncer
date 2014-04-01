@@ -1,6 +1,5 @@
 import nose
 from nose.tools import assert_raises
-
 from bouncer import authorization_target, authorization_method, Ability
 from bouncer.constants import *
 
@@ -66,7 +65,6 @@ def test_dictionary_defination_usage():
             abilities.append(READ, ALL)
             abilities.append(EDIT, Article, author=user)
 
-
     @authorization_target
     class User(object):
 
@@ -120,7 +118,6 @@ def test_finding_relivant_rules():
             abilities.append(EDIT, BlogPost, author_id=user.id)
             abilities.append(READ, BlogPost, visible=True, active=True)
 
-
     @authorization_target
     class User(object):
 
@@ -145,8 +142,6 @@ def test_finding_relivant_rules():
             self.author_id = kwargs['author_id']
             self.visible = kwargs.get('visible', True)
             self.active = kwargs.get('active', True)
-
-
 
     # Test relevant_rules
     billy = User(name='billy', admin=True)
@@ -188,7 +183,6 @@ def test_using_class_strings():
                 return article.author == user
 
             abilities.append(EDIT, 'Article', if_author)
-
 
     @authorization_target
     class User(object):
