@@ -2,6 +2,7 @@ import nose
 from nose.tools import assert_raises
 from bouncer import authorization_target, authorization_method, Ability
 from bouncer.constants import *
+from models import User, Article, BlogPost
 
 
 def test_basic_usage():
@@ -20,24 +21,7 @@ def test_basic_usage():
 
             abilities.append(EDIT, Article, if_author)
 
-
-    @authorization_target
-    class User(object):
-
-        def __init__(self, **kwargs):
-            self.id = kwargs.get('id', 1)
-            self.name = kwargs['name']
-            self.admin = kwargs['admin']
-            pass
-
-        @property
-        def is_admin(self):
-            return self.admin
-
-    class Article(object):
-
-        def __init__(self, **kwargs):
-            self.author = kwargs['author']
+    authorization_target(User)
 
     sally = User(name='sally', admin=False)
     billy = User(name='billy', admin=True)
@@ -65,23 +49,7 @@ def test_dictionary_defination_usage():
             abilities.append(READ, ALL)
             abilities.append(EDIT, Article, author=user)
 
-    @authorization_target
-    class User(object):
-
-        def __init__(self, **kwargs):
-            self.id = kwargs.get('id', 1)
-            self.name = kwargs['name']
-            self.admin = kwargs['admin']
-            pass
-
-        @property
-        def is_admin(self):
-            return self.admin
-
-    class Article(object):
-
-        def __init__(self, **kwargs):
-            self.author = kwargs['author']
+    authorization_target(User)
 
     sally = User(name='sally', admin=False)
     billy = User(name='billy', admin=True)
@@ -118,30 +86,7 @@ def test_finding_relivant_rules():
             abilities.append(EDIT, BlogPost, author_id=user.id)
             abilities.append(READ, BlogPost, visible=True, active=True)
 
-    @authorization_target
-    class User(object):
-
-        def __init__(self, **kwargs):
-            self.id = kwargs.get('id', 1)
-            self.name = kwargs['name']
-            self.admin = kwargs['admin']
-            pass
-
-        @property
-        def is_admin(self):
-            return self.admin
-
-    class Article(object):
-
-        def __init__(self, **kwargs):
-            self.author = kwargs['author']
-
-    class BlogPost(object):
-
-        def __init__(self, **kwargs):
-            self.author_id = kwargs['author_id']
-            self.visible = kwargs.get('visible', True)
-            self.active = kwargs.get('active', True)
+    authorization_target(User)
 
     # Test relevant_rules
     billy = User(name='billy', admin=True)
@@ -171,49 +116,45 @@ def test_finding_relivant_rules():
 def test_using_class_strings():
 
     @authorization_method
-    def authorize(user, abilities):
+    def authorize(user, they):
+        they.can(EDIT, 'Article')
 
-        if user.is_admin:
-            # self.can_manage(ALL)
-            abilities.append(MANAGE, ALL)
-        else:
-            abilities.append(READ, ALL)
-
-            def if_author(article):
-                return article.author == user
-
-            abilities.append(EDIT, 'Article', if_author)
-
-    @authorization_target
-    class User(object):
-
-        def __init__(self, **kwargs):
-            self.id = kwargs.get('id', 1)
-            self.name = kwargs['name']
-            self.admin = kwargs['admin']
-            pass
-
-        @property
-        def is_admin(self):
-            return self.admin
-
-    class Article(object):
-
-        def __init__(self, **kwargs):
-            self.author = kwargs['author']
+    authorization_target(User)
 
     sally = User(name='sally', admin=False)
-    billy = User(name='billy', admin=True)
 
     article = Article(author=sally)
 
-    # check abilities
+    # Can edit articles in general
+    assert sally.can(EDIT, Article)
+
+    # Can edit specific article
     assert sally.can(EDIT, article)
 
-    billys_article = Article(author=billy)
 
-    assert sally.cannot(EDIT, billys_article)
-    assert billy.can(EDIT, billys_article)
+def test_cannot_override():
+
+    @authorization_method
+    def authorize(user, they):
+        they.can(MANAGE, ALL)
+        they.cannot(DELETE, Article)
+
+    authorization_target(User)
+
+    sally = User(name='sally', admin=False)
+
+    # test checks againsts a articles in general
+    assert sally.can(READ, Article)
+    assert sally.cannot(DELETE, Article)
+
+    article = Article(author=sally)
+
+    # test checks againsts a specific article
+    assert sally.can(READ, article)
+    assert sally.cannot(DELETE, article)
+
+
+
 
 
 if __name__ == "__main__":
