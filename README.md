@@ -129,6 +129,15 @@ def authorize(user, abilities):
 they.can((EDIT,READ,DELETE),(Article,Photo))
 ```
 
+#### Combining Abilities
+It is posible to define multiple abilites for the same resource.  This is particularly useful in combination
+with the `cannot` method
+
+```python
+they.can(MANAGE, ALL)
+then.cannot(DELETE, ('USER', 'ACCOUNT')
+```
+
 ## 2. Check Abilities & Authorization
 
 Helper methods are mixed into your User model (once it is decorated with the `@authorization_target`)

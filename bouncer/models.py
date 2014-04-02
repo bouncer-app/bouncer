@@ -1,5 +1,13 @@
 from bouncer.constants import *
 import inspect
+import sys
+
+PY3 = sys.version_info[0] == 3
+
+if PY3:
+    string_types = str,
+else:
+    string_types = basestring,
 
 
 def listify(list_or_single):
@@ -22,6 +30,9 @@ class Rule(object):
             self.conditions = conditions
         elif len(conditions_hash) > 0:
             self.conditions = conditions_hash
+
+    def __repr__(self):
+        return "%s(%r)" % (self.__class__, self.__dict__)
 
     # Matches both the subject and action, not necessarily the conditions
     def is_relavant(self, action, subject):
@@ -66,12 +77,23 @@ class Rule(object):
         return self.conditions(subject)
 
     def matches_subject_class(self, subject):
+        """
+        subject can be either Classes or instances of classes
+        self.subjects can either be string or Classes
+        """
         for sub in self.subjects:
-            if (inspect.isclass(sub) and isinstance(subject, sub)) or \
-                subject.__class__.__name__ == str(sub) or \
-                    (inspect.isclass(subject) and issubclass(subject, sub)):
-                    return True
+            if inspect.isclass(sub):
+                if inspect.isclass(subject):
+                    return issubclass(subject, sub)
+                else:
+                    return isinstance(subject, sub)
+            elif isinstance(sub, string_types):
+                if inspect.isclass(subject):
+                    return subject.__name__ == sub
+                else:
+                    return subject.__class__.__name__ == sub
         return False
+
 
 
 class RuleList(list):
@@ -103,6 +125,17 @@ class RuleList(list):
     #         they.can(EDIT, Article, if_author)
     can = append
 
+    def cannot(self, *item_description_or_rule, **kwargs):
+        # Will check it a Rule or a description of a rule
+        # construct a rule if necessary then append
+        if len(item_description_or_rule) == 1 and isinstance(item_description_or_rule[0], Rule):
+            item = item_description_or_rule[0]
+            super(RuleList, self).append(item)
+        else:
+            # try to construct a rule
+            item = Rule(False, *item_description_or_rule, **kwargs)
+            super(RuleList, self).append(item)
+
 
 class Ability(object):
 
@@ -118,6 +151,9 @@ class Ability(object):
             # see if one has been set globaly
             self.authorization_method = get_authorization_method()
 
+    def __repr__(self):
+        return "%s(%r)" % (self.__class__, self.__dict__)
+
     @property
     def authorization_method(self):
         return self._authorization_method
@@ -130,8 +166,12 @@ class Ability(object):
             self._authorization_method(self.user, self.rules)
 
     def can(self, action, subject):
-        # print "Can {} {} on {}".format(self.user, action, subject)
-        return any(rule.matches_conditions(action, subject) for rule in self.relevant_rules_for_match(action, subject))
+        matches = [rule for rule in self.relevant_rules_for_match(action, subject) if rule.matches_conditions(action, subject)]
+        if matches:
+            match = matches[0]
+            return match.base_behavior
+        else:
+            return False
 
     def cannot(self, action, subject):
         return not self.can(action, subject)
@@ -140,11 +180,12 @@ class Ability(object):
         matching_rules = []
         for rule in self.rules:
             rule.expanded_actions = self.expand_actions(rule.actions)
-            # print "Expanded Actions for {} is {}".format(rule.actions,rule.expanded_actions)
-            # print "Testing relavancy: {} {}".format(action, subject)
             if rule.is_relavant(action, subject):
                 matching_rules.append(rule)
-        return matching_rules
+
+        # reverse it (better than .reverse() for it does not return None if list is empty
+        # later rules take precidence to earlier defined rules
+        return matching_rules[::-1]
 
     def expand_actions(self, actions):
         """Accepts an array of actions and returns an array of actions which match.
