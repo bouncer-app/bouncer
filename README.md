@@ -135,7 +135,7 @@ with the `cannot` method
 
 ```python
 they.can(MANAGE, ALL)
-then.cannot(DELETE, ('USER', 'ACCOUNT')
+then.cannot(DELETE, ('USER', 'ACCOUNT'))
 ```
 
 ## 2. Check Abilities & Authorization
