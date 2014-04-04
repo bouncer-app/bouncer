@@ -4,9 +4,10 @@ bouncer
 Simple Declarative Authentication DSL inspired by Ryan Bates’ excellent
 cancan library
 
-.. image:: https://travis-ci.org/jtushman/bouncer.svg
+.. image:: https://travis-ci.org/jtushman/bouncer.svg?branch=master
+    :alt: travis-badge
     :target: https://travis-ci.org/jtushman/bouncer
-
+    
 Introduction
 ------------
 
