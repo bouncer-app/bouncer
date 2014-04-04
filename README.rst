@@ -1,10 +1,10 @@
 bouncer
-#######
+=======
 
 Simple Declarative Authentication DSL inspired by Ryan Bates’ excellent
 cancan library
 
-|Build Status|
+.. image:: https://travis-ci.org/jtushman/bouncer.svg?branch=docs   :target: https://travis-ci.org/jtushman/bouncer
 
 Introduction
 ------------
@@ -50,7 +50,6 @@ And once you have that setup, you can ask questions like:
     # Can Marc view articles in general?
     print can(marc, VIEW, Article)       # True
 
-
 Installation
 ------------
 
@@ -94,8 +93,7 @@ A simple setup looks like so …
 
             # See I am using a string here
             abilities.append(EDIT, 'Article', author=user)
-
-
+            
 Alternative syntax
 ~~~~~~~~~~~~~~~~~~
 
@@ -144,7 +142,7 @@ You can (are encouraged to) combine similar rules on a single line:
 .. code:: python
 
     they.can((EDIT,READ,DELETE),(Article,Photo))
-
+    
 Combining Abilities
 ^^^^^^^^^^^^^^^^^^^
 
@@ -179,11 +177,10 @@ There are two main way for checking for authorization.  ``can`` (and its brother
     article = Article(author=jonathan)
 
     # can jonathan delete this specific article
-    can(jonathan, EDIT, article
-
-
+    can(jonathan, EDIT, article)
+    
 Decorating your User Model
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 Helper methods are mixed into your User model (once it is decorated with
 the ``@authorization_target``)
 
@@ -214,7 +211,6 @@ For example:
     print jonathan.can(EDIT,article)   # True
     print marc.can(EDIT,article)       # False
 
-
 Flask
 ^^^^^
 
@@ -225,14 +221,7 @@ Questions / Issues
 ------------------
 
 Feel free to ping me on twitter: `@tushman`_
-or add issues or PRs at https://github.com/jtushman/bouncer
-
-API
----
-.. automodule:: bouncer
-    :members:
-
+or add issues or PRs at https://github.com/jtushman/bouncer    
+    
 .. _flask-bouncer: https://github.com/jtushman/flask-bouncer
 .. _@tushman: http://twitter.com/tushman
-.. |Build Status| image:: https://travis-ci.org/jtushman/bouncer.svg
-    :target: https://travis-ci.org/jtushman/bouncer
