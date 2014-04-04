@@ -3,7 +3,7 @@ from setuptools import setup
 required_modules = []
 
 setup(name='bouncer',
-      version='0.1.9',
+      version='0.1.10',
       description='Simple Declarative Authentication based on Ryan Bates excellent cancan library',
       url='http://github.com/jtushman/bouncer',
       author='Jonathan Tushman',
