@@ -35,8 +35,6 @@ simply to him. For example:
             they.can(EDIT, 'Article', if_author)
 
 
-
-
 And once you have that setup, you can ask questions like:
 
 .. code:: python
@@ -46,11 +44,11 @@ And once you have that setup, you can ask questions like:
 
     article = Article(author=jonathan)
 
-    print jonathan.can(EDIT, article)   # True
-    print marc.can(EDIT, article)       # False
+    print can(jonathan, EDIT, article)   # True
+    print can(marc, EDIT, article)       # False
 
     # Can Marc view articles in general?
-    print marc.can(VIEW, Article)       # True
+    print can(marc, VIEW, Article)       # True
 
 
 Installation
@@ -150,7 +148,7 @@ You can (are encouraged to) combine similar rules on a single line:
 Combining Abilities
 ^^^^^^^^^^^^^^^^^^^
 
-It is posible to define multiple abilites for the same resource. This is
+It is possible to define multiple abilites for the same resource. This is
 particularly useful in combination with the ``cannot`` method
 
 .. code:: python
@@ -160,7 +158,32 @@ particularly useful in combination with the ``cannot`` method
 
 Check Abilities & Authorization
 -------------------------------
+There are two main way for checking for authorization.  ``can`` (and its brother ``cannot``) and ``ensure``
 
+* ``can`` returns a boolean
+* while ensure will raise an AccessDenied Exception
+
+.. code:: python
+
+    from bouncer import can, ensure
+    from bouncer.constants import *
+
+    jonathan = User(name='jonathan',admin=False)
+
+    # can jonathan edit articles in general
+    can(jonathan, EDIT, Article)
+
+    # ensure jonathan edit articles in general -- otherwise we are going to throw an exception
+    ensure(jonathan, EDIT, Article)
+
+    article = Article(author=jonathan)
+
+    # can jonathan delete this specific article
+    can(jonathan, EDIT, article
+
+
+Decorating your User Model
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 Helper methods are mixed into your User model (once it is decorated with
 the ``@authorization_target``)
 
@@ -191,7 +214,9 @@ For example:
     print jonathan.can(EDIT,article)   # True
     print marc.can(EDIT,article)       # False
 
---------------
+
+Flask
+^^^^^
 
 If you use Flask, I am currently working on a Flask extension – follow
 its progress here: `flask-bouncer`_.
