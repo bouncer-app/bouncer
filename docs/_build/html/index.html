@@ -1,0 +1,375 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>bouncer &mdash; bouncer 0.1.9 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.1.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="bouncer 0.1.9 documentation" href="#" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">bouncer 0.1.9 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="bouncer">
+<h1>bouncer<a class="headerlink" href="#bouncer" title="Permalink to this headline">¶</a></h1>
+<p>Simple Declarative Authentication DSL inspired by Ryan Bates’ excellent
+cancan library</p>
+<p><a class="reference external" href="https://travis-ci.org/jtushman/bouncer"><img alt="Build Status" src="https://travis-ci.org/jtushman/bouncer.svg" /></a></p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Meet <strong>bouncer</strong>.</p>
+<p><strong>bouncer</strong> is your faithful servant. Big, burly, trustworthy – smarter
+than he looks, but very effective in what he does. You just have to talk
+simply to him. For example:</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">bouncer</span> <span class="kn">import</span> <span class="n">authorization_method</span>
+<span class="kn">from</span> <span class="nn">bouncer.constants</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="nd">@authorization_method</span>
+<span class="k">def</span> <span class="nf">authorize</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">they</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">is_admin</span><span class="p">:</span>
+        <span class="n">they</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">MANAGE</span><span class="p">,</span> <span class="n">ALL</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">they</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">READ</span><span class="p">,</span> <span class="n">ALL</span><span class="p">)</span>
+        <span class="n">they</span><span class="o">.</span><span class="n">cannot</span><span class="p">(</span><span class="n">READ</span><span class="p">,</span> <span class="s">&#39;TopSecretDocs&#39;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">if_author</span><span class="p">(</span><span class="n">article</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">article</span><span class="o">.</span><span class="n">author</span> <span class="o">==</span> <span class="n">user</span>
+
+        <span class="n">they</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">EDIT</span><span class="p">,</span> <span class="s">&#39;Article&#39;</span><span class="p">,</span> <span class="n">if_author</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And once you have that setup, you can ask questions like:</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">jonathan</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;jonathan&#39;</span><span class="p">,</span><span class="n">admin</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">marc</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">&#39;marc&#39;</span><span class="p">,</span><span class="n">admin</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="n">article</span> <span class="o">=</span> <span class="n">Article</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="n">jonathan</span><span class="p">)</span>
+
+<span class="k">print</span> <span class="n">jonathan</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">EDIT</span><span class="p">,</span> <span class="n">article</span><span class="p">)</span>   <span class="c"># True</span>
+<span class="k">print</span> <span class="n">marc</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">EDIT</span><span class="p">,</span> <span class="n">article</span><span class="p">)</span>       <span class="c"># False</span>
+
+<span class="c"># Can Marc view articles in general?</span>
+<span class="k">print</span> <span class="n">marc</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">VIEW</span><span class="p">,</span> <span class="n">Article</span><span class="p">)</span>       <span class="c"># True</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">bouncer</span></tt></p>
+</div>
+<div class="section" id="defining-abilities">
+<h2>Defining Abilities<a class="headerlink" href="#defining-abilities" title="Permalink to this headline">¶</a></h2>
+<p>User permissions are defined in an method decorated with
+<tt class="docutils literal"><span class="pre">&#64;authorize_method</span></tt></p>
+<p>A simple setup looks like so …</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="nd">@authorization_method</span>
+<span class="k">def</span> <span class="nf">authorize</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">they</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">is_admin</span><span class="p">:</span>
+        <span class="n">they</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">MANAGE</span><span class="p">,</span> <span class="n">ALL</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">they</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">READ</span><span class="p">,</span> <span class="n">ALL</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">if_author</span><span class="p">(</span><span class="n">article</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">article</span><span class="o">.</span><span class="n">author</span> <span class="o">==</span> <span class="n">user</span>
+
+        <span class="n">they</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">EDIT</span><span class="p">,</span> <span class="n">Article</span><span class="p">,</span> <span class="n">if_author</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>If you do not think the “they.can” is pythonic enough you can use the <tt class="docutils literal"><span class="pre">append</span></tt> syntax</li>
+</ul>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="nd">@authorization_method</span>
+<span class="k">def</span> <span class="nf">authorize</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">abilities</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">is_admin</span><span class="p">:</span>
+        <span class="n">abilities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MANAGE</span><span class="p">,</span> <span class="n">ALL</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">abilities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">READ</span><span class="p">,</span> <span class="n">ALL</span><span class="p">)</span>
+
+        <span class="c"># See I am using a string here</span>
+        <span class="n">abilities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">EDIT</span><span class="p">,</span> <span class="s">&#39;Article&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="alternative-syntax">
+<h3>Alternative syntax<a class="headerlink" href="#alternative-syntax" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="dict-syntax">
+<h4><tt class="docutils literal"><span class="pre">dict</span></tt> syntax<a class="headerlink" href="#dict-syntax" title="Permalink to this headline">¶</a></h4>
+<ul class="simple">
+<li>You can also use an alternative <tt class="docutils literal"><span class="pre">dict</span></tt> syntax. The following is equivalent to above:</li>
+</ul>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="nd">@authorization_method</span>
+<span class="k">def</span> <span class="nf">authorize</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">they</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">is_admin</span><span class="p">:</span>
+        <span class="n">they</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">MANAGE</span><span class="p">,</span> <span class="n">ALL</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">they</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">READ</span><span class="p">,</span> <span class="n">ALL</span><span class="p">)</span>
+        <span class="n">they</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">EDIT</span><span class="p">,</span> <span class="n">Article</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>You can add multiple conditions to the <tt class="docutils literal"><span class="pre">dict</span></tt>:</li>
+</ul>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">they</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">READ</span><span class="p">,</span> <span class="n">Article</span><span class="p">,</span> <span class="n">published</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">active</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="strings-instead-of-classes">
+<h4>Strings instead of classes<a class="headerlink" href="#strings-instead-of-classes" title="Permalink to this headline">¶</a></h4>
+<p>Use can use Strings instead of classes (so you do not need to import a bunch of files you are not using in initialization</p>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="nd">@authorization_method</span>
+<span class="k">def</span> <span class="nf">authorize</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">they</span><span class="p">):</span>
+
+    <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">is_admin</span><span class="p">:</span>
+        <span class="n">they</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">MANAGE</span><span class="p">,</span> <span class="n">ALL</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">they</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">READ</span><span class="p">,</span> <span class="n">ALL</span><span class="p">)</span>
+
+        <span class="c"># Notice that I am using a string here</span>
+        <span class="n">they</span><span class="o">.</span><span class="n">can</span><span class="p">(</span><span class="n">EDIT</span><span class="p">,</span> <span class="s">&#39;Article&#39;</span><span class="p">,</span> <span class="n">author</span><span class="o">=</span><span class="n">user</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="you-can-are-encouraged-to-combine-similar-rules-on-a-single-line">
+<h4>You can (are encouraged to) combine similar rules on a single line:<a class="headerlink" href="#you-can-are-encouraged-to-combine-similar-rules-on-a-single-line" title="Permalink to this headline">¶</a></h4>
+<div class="code python highlight-python"><div class="highlight"><pre><span class="n">they</span><span class="o">.</span><span class="n">can</span><span class="p">((</span><span class="n">EDIT</span><span class="p">,</span><span class="n">READ</span><span class="p">,</span><span class="n">DELETE</span><span class="p">),(</span><span class="n">Article</span><span class="p">,</span><span class="n">Photo</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="combining-abilities">
+<h4>Combining Abilities<a class="headerlink" href="#combining-abilities" title="Permalink to this headline">¶</a></h4>
+<p>It is posible to define multiple abilites for the same resource. This is
+particularly useful in combination with the <tt class="docutils literal"><span class="pre">cannot</span></tt> method</p>
+<div class="code python highlight-python"><div class="highlight"><pre>they.can(MANAGE, ALL)
+then.cannot(DELETE, (&#39;USER&#39;, &#39;ACCOUNT&#39;)
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="check-abilities-authorization">
+<h2>Check Abilities &amp; Authorization<a class="headerlink" href="#check-abilities-authorization" title="Permalink to this headline">¶</a></h2>
+<p>Helper methods are mixed into your User model (once it is decorated with
+the <tt class="docutils literal"><span class="pre">&#64;authorization_target</span></tt>)</p>
+<p>For example:</p>
+<div class="code python highlight-python"><div class="highlight"><pre>from bouncer import authorization_target
+
+@authorization_target
+class User(object):
+
+def __init__(self, **kwargs):
+    self.id = kwargs.get(&#39;id&#39;, 1)
+    self.name = kwargs.get(&#39;name&#39;, &#39;&#39;)
+    self.admin = kwargs.get(&#39;name&#39;, False)
+    pass
+
+@property
+def is_admin(self):
+    return self.admin
+
+jonathan = User(name=&#39;jonathan&#39;,admin=False)
+marc = User(name=&#39;marc&#39;,admin=False)
+
+article = Article(author=jonathan)
+
+print jonathan.can(EDIT,article)   # True
+print marc.can(EDIT,article)       # False
+</pre></div>
+</div>
+<hr class="docutils" />
+<p>If you use Flask, I am currently working on a Flask extension – follow
+its progress here: <a class="reference external" href="https://github.com/jtushman/flask-bouncer">flask-bouncer</a>.</p>
+</div>
+<div class="section" id="questions-issues">
+<h2>Questions / Issues<a class="headerlink" href="#questions-issues" title="Permalink to this headline">¶</a></h2>
+<p>Feel free to ping me on twitter: <a class="reference external" href="http://twitter.com/tushman">&#64;tushman</a>
+or add issues or PRs at <a class="reference external" href="https://github.com/jtushman/bouncer">https://github.com/jtushman/bouncer</a></p>
+</div>
+<div class="section" id="module-bouncer">
+<span id="api"></span><h2>API<a class="headerlink" href="#module-bouncer" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id1">
+<h3>bouncer<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Simple Declarative Authentication DSL inspired by Ryan Bates excellent cancan library</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">copyright:</th><td class="field-body"><ol class="first loweralpha simple" start="3">
+<li>2014 by Jonathan Tushman.</li>
+</ol>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">license:</th><td class="field-body"><p class="first last">MIT, see LICENSE for more details.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="function">
+<dt id="bouncer.authorization_method">
+<tt class="descclassname">bouncer.</tt><tt class="descname">authorization_method</tt><big>(</big><em>original_method</em><big>)</big><a class="headerlink" href="#bouncer.authorization_method" title="Permalink to this definition">¶</a></dt>
+<dd><p>The method that will be injected into the authorization target to perform authorization</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bouncer.authorization_target">
+<tt class="descclassname">bouncer.</tt><tt class="descname">authorization_target</tt><big>(</big><em>original_class</em><big>)</big><a class="headerlink" href="#bouncer.authorization_target" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Add bouncer goodness to the model.  This is a class decorator, when added to your User model if will add</dt>
+<dd><tt class="docutils literal"><span class="pre">can</span></tt> and <tt class="docutils literal"><span class="pre">cannot</span></tt> methods to the class</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>original_class</strong> &#8211; </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bouncer.can">
+<tt class="descclassname">bouncer.</tt><tt class="descname">can</tt><big>(</big><em>user</em>, <em>action</em>, <em>subject</em><big>)</big><a class="headerlink" href="#bouncer.can" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if a given user has the ability to perform the action on a subject</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>user</strong> &#8211; A user object</li>
+<li><strong>action</strong> &#8211; an action string, typically &#8216;read&#8217;, &#8216;edit&#8217;, &#8216;manage&#8217;.  Use bouncer.constants for readability</li>
+<li><strong>subject</strong> &#8211; the resource in question.  Either a Class or an instance of a class.  Pass the class if you
+want to know if the user has general access to perform the action on that type of object.  Or
+pass a specific object, if you want to know if the user has the ability to that specific instance</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Boolean</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="bouncer.cannot">
+<tt class="descclassname">bouncer.</tt><tt class="descname">cannot</tt><big>(</big><em>user</em>, <em>action</em>, <em>subject</em><big>)</big><a class="headerlink" href="#bouncer.cannot" title="Permalink to this definition">¶</a></dt>
+<dd><p>inverse of <tt class="docutils literal"><span class="pre">can</span></tt></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="bouncer.ensure">
+<tt class="descclassname">bouncer.</tt><tt class="descname">ensure</tt><big>(</big><em>user</em>, <em>action</em>, <em>subject</em><big>)</big><a class="headerlink" href="#bouncer.ensure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Similar to <tt class="docutils literal"><span class="pre">can</span></tt> but will raise a AccessDenied Exception if does not have access</p>
+</dd></dl>
+
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">bouncer</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#defining-abilities">Defining Abilities</a><ul>
+<li><a class="reference internal" href="#alternative-syntax">Alternative syntax</a><ul>
+<li><a class="reference internal" href="#dict-syntax"><tt class="docutils literal"><span class="pre">dict</span></tt> syntax</a></li>
+<li><a class="reference internal" href="#strings-instead-of-classes">Strings instead of classes</a></li>
+<li><a class="reference internal" href="#you-can-are-encouraged-to-combine-similar-rules-on-a-single-line">You can (are encouraged to) combine similar rules on a single line:</a></li>
+<li><a class="reference internal" href="#combining-abilities">Combining Abilities</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#check-abilities-authorization">Check Abilities &amp; Authorization</a></li>
+<li><a class="reference internal" href="#questions-issues">Questions / Issues</a></li>
+<li><a class="reference internal" href="#module-bouncer">API</a><ul>
+<li><a class="reference internal" href="#id1">bouncer</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="#">bouncer 0.1.9 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jonathan Tushman.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+    </div>
+  </body>
+</html>

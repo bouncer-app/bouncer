@@ -1,11 +1,41 @@
 import nose
-from nose.tools import assert_raises
-from bouncer import authorization_target, authorization_method, Ability
+from nose.tools import assert_raises, raises
+from bouncer import authorization_target, authorization_method, Ability, can, cannot, ensure
+from bouncer.exceptions import AccessDenied
 from bouncer.constants import *
 from models import User, Article, BlogPost
 
 
 def test_basic_usage():
+
+    @authorization_method
+    def authorize(user, abilities):
+
+        if user.is_admin:
+            # self.can_manage(ALL)
+            abilities.append(MANAGE, ALL)
+        else:
+            abilities.append(READ, ALL)
+
+            def if_author(article):
+                return article.author == user
+
+            abilities.append(EDIT, Article, if_author)
+
+    sally = User(name='sally', admin=False)
+    billy = User(name='billy', admin=True)
+
+    article = Article(author=sally)
+
+    # check abilities
+    assert can(sally, EDIT, article)
+
+    billys_article = Article(author=billy)
+
+    assert cannot(sally, EDIT, billys_article)
+    assert can(billy, EDIT, billys_article)
+
+def test_user_decorator():
 
     @authorization_method
     def authorize(user, abilities):
@@ -36,6 +66,32 @@ def test_basic_usage():
     assert sally.cannot(EDIT, billys_article)
     assert billy.can(EDIT, billys_article)
 
+@raises(AccessDenied)
+def test_ensure():
+
+    @authorization_method
+    def authorize(user, abilities):
+
+        if user.is_admin:
+            # self.can_manage(ALL)
+            abilities.append(MANAGE, ALL)
+        else:
+            abilities.append(READ, ALL)
+
+            def if_author(article):
+                return article.author == user
+
+            abilities.append(EDIT, Article, if_author)
+
+
+    sally = User(name='sally', admin=False)
+    billy = User(name='billy', admin=True)
+
+    article = Article(author=sally)
+    billys_article = Article(author=billy)
+
+    # This should raise and AccessDenied exception
+    ensure(sally, EDIT, billys_article)
 
 def test_dictionary_defination_usage():
 
