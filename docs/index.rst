@@ -214,7 +214,7 @@ For example:
     print marc.can(EDIT,article)       # False
 
 Flask
-^^^^^
+-----
 
 If you use Flask, I am currently working on a Flask extension – follow
 its progress here: `flask-bouncer`_.
