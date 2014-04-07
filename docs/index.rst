@@ -60,6 +60,8 @@ Installation
 Defining Abilities
 ------------------
 
+@authorization_method
+~~~~~~~~~~~~~~~~~~~~~
 User permissions are defined in an method decorated with
 ``@authorize_method``
 
@@ -138,8 +140,9 @@ Use can use Strings instead of classes (so you do not need to import a bunch of 
             they.can(EDIT, 'Article', author=user)
 
 
+Combining Rules
+^^^^^^^^^^^^^^^
 You can (are encouraged to) combine similar rules on a single line:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: python
 
@@ -156,8 +159,8 @@ particularly useful in combination with the ``cannot`` method
     they.can(MANAGE, ALL)
     then.cannot(DELETE, ('USER', 'ACCOUNT')
 
-Check Abilities & Authorization
--------------------------------
+Checking Abilities
+------------------
 There are two main way for checking for authorization.  ``can`` (and its brother ``cannot``) and ``ensure``
 
 * ``can`` returns a boolean
@@ -183,8 +186,7 @@ There are two main way for checking for authorization.  ``can`` (and its brother
     
 Decorating your User Model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-Helper methods are mixed into your User model (once it is decorated with
-the ``@authorization_target``)
+Optionally, you can add helper methods into your User model by using ``@authorization_target``
 
 For example:
 
