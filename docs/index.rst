@@ -62,7 +62,7 @@ Defining Abilities
 
 @authorization_method
 ~~~~~~~~~~~~~~~~~~~~~
-User permissions are defined in an method decorated with
+User permissions are defined in a method decorated with
 ``@authorize_method``
 
 A simple setup looks like so …
@@ -83,7 +83,7 @@ A simple setup looks like so …
             they.can(EDIT, Article, if_author)
 
 
-* If you do not think the “they.can” is pythonic enough you can use the ``append`` syntax
+If you do not think the “they.can” is pythonic enough you can use the ``append`` syntax
 
 .. code:: python
 
@@ -103,7 +103,7 @@ Alternative syntax
 
 ``dict`` syntax
 ^^^^^^^^^^^^^^^
-* You can also use an alternative ``dict`` syntax. The following is equivalent to above:
+You can also use an alternative ``dict`` syntax. The following is equivalent to above:
 
 .. code:: python
 
@@ -116,7 +116,7 @@ Alternative syntax
             they.can(READ, ALL)
             they.can(EDIT, Article, author=user)
 
-* You can add multiple conditions to the ``dict``:
+You can add multiple conditions to the ``dict``:
 
 .. code:: python
 
@@ -124,7 +124,7 @@ Alternative syntax
 
 Strings instead of classes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-Use can use Strings instead of classes (so you do not need to import a bunch of files you are not using in initialization
+Use can use Strings instead of classes so you do not need to import a bunch of files you are not using in initialization
 
 .. code:: python
 
@@ -161,10 +161,10 @@ particularly useful in combination with the ``cannot`` method
 
 Checking Abilities
 ------------------
-There are two main way for checking for authorization.  ``can`` (and its brother ``cannot``) and ``ensure``
+There are two main ways for checking for authorization.  ``can`` (and its brother ``cannot``) and ``ensure``
 
 * ``can`` returns a boolean
-* while ensure will raise an AccessDenied Exception
+* ``ensure`` will raise an ``AccessDenied`` Exception
 
 .. code:: python
 
