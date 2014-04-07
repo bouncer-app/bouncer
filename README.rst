@@ -200,7 +200,7 @@ For example:
     def __init__(self, **kwargs):
         self.id = kwargs.get('id', 1)
         self.name = kwargs.get('name', '')
-        self.admin = kwargs.get('name', False)
+        self.admin = kwargs.get('admin', False)
         pass
 
     @property
