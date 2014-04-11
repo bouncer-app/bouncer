@@ -197,16 +197,16 @@ For example:
     @authorization_target
     class User(object):
 
-    def __init__(self, **kwargs):
-        self.id = kwargs.get('id', 1)
-        self.name = kwargs.get('name', '')
-        self.admin = kwargs.get('admin', False)
-        pass
-
-    @property
-    def is_admin(self):
-        return self.admin
-
+        def __init__(self, **kwargs):
+            self.id = kwargs.get('id', 1)
+            self.name = kwargs.get('name', '')
+            self.admin = kwargs.get('admin', False)
+            pass
+    
+        @property
+        def is_admin(self):
+            return self.admin
+    
     jonathan = User(name='jonathan',admin=False)
     marc = User(name='marc',admin=False)
 
