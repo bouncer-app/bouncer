@@ -3,7 +3,7 @@ from nose.tools import assert_raises, raises
 from bouncer import authorization_target, authorization_method, Ability, can, cannot, ensure
 from bouncer.exceptions import AccessDenied
 from bouncer.constants import *
-from models import User, Article, BlogPost
+from bouncer.test_bouncer.models import User, Article, BlogPost
 
 
 def test_basic_usage():
