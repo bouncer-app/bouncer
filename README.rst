@@ -124,7 +124,7 @@ You can add multiple conditions to the ``dict``:
 
 Strings instead of classes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
-Use can use Strings instead of classes so you do not need to import a bunch of files you are not using in initialization
+You can use strings instead of classes. This means you do not need to import a bunch of files you are not using in initialization
 
 .. code:: python
 
@@ -157,7 +157,7 @@ particularly useful in combination with the ``cannot`` method
 .. code:: python
 
     they.can(MANAGE, ALL)
-    then.cannot(DELETE, ('USER', 'ACCOUNT')
+    then.cannot(DELETE, ('USER', 'ACCOUNT'))
 
 Checking Abilities
 ------------------
@@ -197,16 +197,16 @@ For example:
     @authorization_target
     class User(object):
 
-    def __init__(self, **kwargs):
-        self.id = kwargs.get('id', 1)
-        self.name = kwargs.get('name', '')
-        self.admin = kwargs.get('name', False)
-        pass
-
-    @property
-    def is_admin(self):
-        return self.admin
-
+        def __init__(self, **kwargs):
+            self.id = kwargs.get('id', 1)
+            self.name = kwargs.get('name', '')
+            self.admin = kwargs.get('admin', False)
+            pass
+    
+        @property
+        def is_admin(self):
+            return self.admin
+    
     jonathan = User(name='jonathan',admin=False)
     marc = User(name='marc',admin=False)
 
